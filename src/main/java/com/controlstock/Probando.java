@@ -22,4 +22,21 @@ public class Probando {
     private boolean isCredentialsNonExpired = true;
 
     //
+
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword; //Entidad ForgotPassword
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;  //Enum UserRole  (USER - ADMIN)
+
+    private boolean isEnabled = true;
+
+    private boolean isAccountNonExpired = true;
+
+    private boolean isAccountNonLocked = true;
+
+    private boolean isCredentialsNonExpired = true;
+
+
+
 }
