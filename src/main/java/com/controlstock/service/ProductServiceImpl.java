@@ -137,11 +137,57 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
-        return null;
+        //1- Compruebo que el Product exista en la DB
+        Product prod = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
+
+        //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
+       String fileName = prod.getImage();
+       if (file != null) {
+           Files.deleteIfExists(Paths.get(path + File.separator + fileName));
+           fileName = fileService.uploadFile(path, file);
+       }
+
+       //3- Defino el nombre del archivo/imagen de ProductDto según el proceso anterior (fileName en el if)
+        productDto.setImage(fileName);
+
+       //4-Asigno el cambio/actualización al objeto Movie
+        Product product = new Product(
+                prod.getProductId(),
+                productDto.getName(),
+                productDto.getDescription(),
+                productDto.getPrice(),
+                productDto.getStock(),
+                productDto.getCategory(),
+                productDto.getSupplier(),
+                productDto.getImage()
+        );
+
+        //5- Guardo el Obj Product con los cambios actualizados
+        Product updatedProduct = productRepository.save(product);
+
+        //6-Genero la URL de la imagen/archivo del producto
+        String imageUrl = baseUrl + "/file/" + fileName;
+
+        //7- Retorno el DTO del producto como respuesta
+        return new ProductDto(
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                product.getCategory(),
+                product.getSupplier(),
+                product.getImage(),
+                imageUrl
+        );
     }
+
 
     @Override
     public String deleteProduct(Integer productId) throws IOException {
+
+
         return "";
     }
 }
