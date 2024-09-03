@@ -40,5 +40,7 @@ public class ProductDto {
     private String supplier; //Cómo puse opcional, no le agregué validación adicional
 
 
-    private String imageUrl; //Cómo puse opcional, no le agregué validación adicional
+    private String image; //Cómo puse opcional, no le agregué validación adicional
+
+    private String imageUrl;
 }
