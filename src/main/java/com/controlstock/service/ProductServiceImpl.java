@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -106,8 +107,33 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductDto> getAllProducts() {
-        return List.of();
+        //1- Recupero todos los productos de la DB y lo guardo en 'products'
+        List<Product> products = productRepository.findAll();
+        //Creo una lista vacía para guardar la lista de Obj products
+        List<ProductDto> productDtos = new ArrayList<>();
+
+        //2- Transformo la lista de Obj products en una lista de Obj DTO (y genero la URL de la image/archivo)
+        for (Product product : products) { //Cada product de la lista de products
+            String imageUrl = baseUrl + "/file/" + product.getImage();
+            ProductDto response = new ProductDto(
+                    product.getProductId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getPrice(),
+                    product.getStock(),
+                    product.getCategory(),
+                    product.getSupplier(),
+                    product.getImage(),
+                    imageUrl
+            );
+
+            productDtos.add(response);
+        }
+
+        //Devuelvo la Lista DTO de productos
+        return productDtos;
     }
+
 
     @Override
     public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
