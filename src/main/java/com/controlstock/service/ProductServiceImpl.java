@@ -81,8 +81,28 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductDto getProduct(Integer productId) {
-        return null;
+        //1-Comprobar existencia del producto en la DB (Y si existe devuelve el Obj Product con ese ID)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id =" + productId));
+
+        //2- Genero la URL de la imagen del producto
+        String imageUrl = baseUrl + "/file/" + product.getImage();
+
+        //3- Genero la respuesta que va a devolver este método (Devuelvo Obj DTO del producto)
+        return new ProductDto(
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                product.getCategory(),
+                product.getSupplier(),
+                product.getImage(),
+                imageUrl
+        );
     }
+
+
 
     @Override
     public List<ProductDto> getAllProducts() {
