@@ -29,16 +29,16 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Value("${project.imageProduct}")
-    private String path;
+    private String path; //Saqué la url de las imágenes/archivos de los productos ("imageProduct/")
 
     @Value("${base.url}")
-    private String baseUrl;
+    private String baseUrl; //Saqué le url base ("http://localhost:8080")
 
     @Override
     public ProductDto addProduct(ProductDto productDto, MultipartFile file) throws IOException {
         //1- Cargar archivo (verifico si el nombre del archivo ya existe o no)
         if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))){
-            throw new RuntimeException("File already exists: Please enter another file name!")
+            throw new RuntimeException("File already exists: Please enter another file name!");
         }
 
         String uploadedFileName = fileService.uploadFile(path, file); //Para cargar el archivo hay que traer el método de servicio de archivos 'FileService'
