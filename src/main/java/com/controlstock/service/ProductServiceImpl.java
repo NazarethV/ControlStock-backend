@@ -186,8 +186,32 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public String deleteProduct(Integer productId) throws IOException {
+        //1- Verifico si el producto existe en la DB
+        Product prod = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
+        //Si se encuentra el Product en la DB, se guarda el ID
+        Integer id = prod.getProductId();
 
+        //2- Se elimina primero el archivo asociado al Obj Product que se quiere eliminar
+        Files.deleteIfExists(Paths.get(path + File.separator + prod.getImage()));
 
-        return "";
+        //3- Elimino el Obj Prod del repositorio (es decir de la base de datos)
+        productRepository.delete(prod);
+
+        return "Product deleted with id = " + id;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
