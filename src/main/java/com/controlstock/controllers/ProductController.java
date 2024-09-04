@@ -6,13 +6,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -35,6 +33,31 @@ public ResponseEntity<ProductDto> addProductHandler(@RequestPart MultipartFile f
 
 }
 
+@GetMapping("/{productId}")
+public ResponseEntity<ProductDto> getProductHandler(@PathVariable Integer productId) {
+        return ResponseEntity.ok(productService.getProduct(productId));
+}
+
+
+@GetMapping("/all")
+public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
+        return ResponseEntity.ok(productService.getAllProducts());
+}
+
+@PutMapping("/update/{productId}")
+public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
+                                                       @RequestPart MultipartFile file,
+                                                       @RequestPart String productDtoObj) throws IOException {
+   if (file.isEmpty()) file = null;
+   ProductDto productDto = convertToProductDto(productDtoObj);
+   return ResponseEntity.ok(productService.updateProduct(productId, productDto, file));
+}
+
+
+@DeleteMapping("/delete/{productId}")
+public ResponseEntity<String> deleteProductHandler(@PathVariable Integer productId) throws IOException {
+        return ResponseEntity.ok(productService.deleteProduct(productId));
+}
 
 
 //Método Genérico para la CONVERSIÓN del Obj Product
