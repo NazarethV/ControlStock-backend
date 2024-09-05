@@ -22,7 +22,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-@PostMapping("/add-product")
+@PostMapping("/add-product")   //En el BODY envío la info en la variable 'productDto' y 'file'(para la imagen)
 public ResponseEntity<ProductDto> addProductHandler(@RequestPart MultipartFile file,
                                                     @RequestPart String productDto) throws IOException, RuntimeException{
     //Agrego después las excepciones
@@ -44,7 +44,7 @@ public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
         return ResponseEntity.ok(productService.getAllProducts());
 }
 
-@PutMapping("/update/{productId}")
+@PutMapping("/update/{productId}")   //En el BODY envío la info en la variable 'productDtoObj' y 'file'(para la imagen)
 public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
                                                        @RequestPart MultipartFile file,
                                                        @RequestPart String productDtoObj) throws IOException {
