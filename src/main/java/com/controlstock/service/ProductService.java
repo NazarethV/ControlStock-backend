@@ -18,9 +18,9 @@ public interface ProductService {
 
     String deleteProduct(Integer productId) throws IOException;
 
-    //ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize);
+    ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize);
 
-    //ProductPageResponse getAllProductsWithPaginationAndSorting(Integer pageNumber, Integer pageSize,
+    ProductPageResponse getAllProductsWithPaginationAndSorting(Integer pageNumber, Integer pageSize,
                                                               // String sortBy, String dir);
 
 }
