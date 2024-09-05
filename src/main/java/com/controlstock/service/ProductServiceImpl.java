@@ -2,9 +2,14 @@ package com.controlstock.service;
 
 
 import com.controlstock.dto.ProductDto;
+import com.controlstock.dto.ProductPageResponse;
 import com.controlstock.entities.Product;
 import com.controlstock.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -202,16 +207,84 @@ public class ProductServiceImpl implements ProductService{
     }
 
 
+    @Override
+    public ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize) {
+        //Pageable: Interfaz para la configuración del PAGINADO
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
+        Page<Product> productPages = productRepository.findAll(pageable);
+        List<Product> products = productPages.getContent();
 
+        List<ProductDto> productDtos = new ArrayList<>();
 
+        for (Product product : products) {
+            String imageUrl = baseUrl + "/file/" + product.getImage();
+            ProductDto productDto = new ProductDto(
+                    product.getProductId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getPrice(),
+                    product.getStock(),
+                    product.getCategory(),
+                    product.getSupplier(),
+                    product.getImage(),
+                    imageUrl
+            );
+            productDtos.add(productDto);
+        }
+        return new ProductPageResponse(productDtos, pageNumber, pageSize,
+                productPages.getTotalElements(),
+                productPages.getTotalPages(),
+                productPages.isLast());
+    }
 
+    @Override
+    public ProductPageResponse getAllProductsWithPaginationAndSorting(Integer pageNumber, Integer pageSize, String sortBy, String dir) {
+        Sort sort = dir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
+        Page<Product> productPages = productRepository.findAll(pageable);
+        List<Product> products = productPages.getContent();
 
+        List<ProductDto> productDtos = new ArrayList<>();
 
-
-
+        for (Product product : products) {
+            String imageUrl = baseUrl + "/file/" + product.getImage();
+            ProductDto productDto = new ProductDto(
+                    product.getProductId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getPrice(),
+                    product.getStock(),
+                    product.getCategory(),
+                    product.getSupplier(),
+                    product.getImage(),
+                    imageUrl
+            );
+            productDtos.add(productDto);
+        }
+        return new ProductPageResponse(productDtos, pageNumber, pageSize,
+                productPages.getTotalElements(),
+                productPages.getTotalPages(),
+                productPages.isLast()
+        );
+    }
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

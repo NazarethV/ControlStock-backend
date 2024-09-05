@@ -1,6 +1,7 @@
 package com.controlstock.service;
 
 import com.controlstock.dto.ProductDto;
+import com.controlstock.dto.ProductPageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,9 +19,9 @@ public interface ProductService {
 
     String deleteProduct(Integer productId) throws IOException;
 
-    //ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize);
+    ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize);
 
-    //ProductPageResponse getAllProductsWithPaginationAndSorting(Integer pageNumber, Integer pageSize,
-                                                              // String sortBy, String dir);
+    ProductPageResponse getAllProductsWithPaginationAndSorting(Integer pageNumber, Integer pageSize,
+                                                               String sortBy, String dir);
 
 }
