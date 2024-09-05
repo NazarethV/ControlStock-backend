@@ -1,6 +1,7 @@
 package com.controlstock.service;
 
 import com.controlstock.dto.ProductDto;
+import com.controlstock.dto.ProductPageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,6 +22,6 @@ public interface ProductService {
     ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize);
 
     ProductPageResponse getAllProductsWithPaginationAndSorting(Integer pageNumber, Integer pageSize,
-                                                              // String sortBy, String dir);
+                                                               String sortBy, String dir);
 
 }
