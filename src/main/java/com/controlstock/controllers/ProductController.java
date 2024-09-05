@@ -1,7 +1,9 @@
 package com.controlstock.controllers;
 
 import com.controlstock.dto.ProductDto;
+import com.controlstock.dto.ProductPageResponse;
 import com.controlstock.service.ProductService;
+import com.controlstock.utils.AppConstants;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
@@ -57,6 +59,26 @@ public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer pro
 @DeleteMapping("/delete/{productId}")
 public ResponseEntity<String> deleteProductHandler(@PathVariable Integer productId) throws IOException {
         return ResponseEntity.ok(productService.deleteProduct(productId));
+}
+
+
+@GetMapping("/allProductsPage")
+public ResponseEntity<ProductPageResponse> getProductsWithPagination(
+        @RequestParam(defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam(defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+){
+        return ResponseEntity.ok(productService.getAllProductsWithPagination(pageNumber, pageSize));
+}
+
+
+@GetMapping("/allProductsPageSort")
+public ResponseEntity<ProductPageResponse> getProductsWithPaginationAndSorting(
+        @RequestParam(defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam(defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+        @RequestParam(defaultValue = AppConstants.SORT_BY, required = false) String sortBy,
+        @RequestParam(defaultValue = AppConstants.SORT_DIR, required = false) String dir
+) {
+       return ResponseEntity.ok(productService.getAllProductsWithPaginationAndSorting(pageNumber, pageSize, sortBy, dir));
 }
 
 
