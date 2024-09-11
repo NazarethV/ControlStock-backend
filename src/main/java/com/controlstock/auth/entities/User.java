@@ -1,6 +1,8 @@
 package com.controlstock.auth.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,22 +22,32 @@ import java.util.List;
 @Builder
 public class User implements UserDetails {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
 
+    @NotBlank(message = "The name field can´t be blank")
     private String name;
 
+    @NotBlank(message = "The username field can´t be blank")
+    @Column(unique = true)
     private String username;
 
+    @NotBlank(message = "The email field can´t be blank")
+    @Column(unique = true)
+    //@Email(message = "Please enter email in proper format!")
     private String email;
 
+    @NotBlank(message = "The password field can´t be blank")
+    @Size(min = 5, message = "The password must have at least 5 characters")
     private String password;
 
     //
-//    @OneToOne(mappedBy = "user")
-//    private RefreshToken refreshToken;  //Entidad RefreshToken
-//
-//    @OneToOne(mappedBy = "user")
-//    private ForgotPassword forgotPassword; //Entidad ForgotPassword
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;  //Entidad RefreshToken
+
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword; //Entidad ForgotPassword
 
 
     @Enumerated(EnumType.STRING)
