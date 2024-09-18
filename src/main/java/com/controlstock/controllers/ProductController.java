@@ -2,12 +2,14 @@ package com.controlstock.controllers;
 
 import com.controlstock.dto.ProductDto;
 import com.controlstock.dto.ProductPageResponse;
+import com.controlstock.exceptions.EmptyFileException;
 import com.controlstock.service.ProductService;
 import com.controlstock.utils.AppConstants;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,13 +26,17 @@ public class ProductController {
         this.productService = productService;
     }
 
+@PreAuthorize("hasAuthority('ADMIN')")   //Sólo el usuario ADMIN puede agregar los productos
 @PostMapping("/add-product")   //En el BODY envío la info en la variable 'productDto' y 'file'(para la imagen)
 public ResponseEntity<ProductDto> addProductHandler(@RequestPart MultipartFile file,
-                                                    @RequestPart String productDto) throws IOException, RuntimeException{
-    //Agrego después las excepciones
+                                                    @RequestPart String productDto) throws IOException, EmptyFileException {
+    //Las excepciones (en caso de que el archivo esté vacio)
+    if (file.isEmpty()) {
+        throw new EmptyFileException("File is empty! Please send another file");
+    }
 
-    //Interactua con el Service
-    ProductDto dto = convertToProductDto(productDto);
+    //Se Interactua con el Service
+    ProductDto dto = convertToProductDto(productDto); //Se convierte cadena a un JSON
     return new ResponseEntity<>(productService.addProduct(dto, file), HttpStatus.CREATED);
 
 }
