@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductService {
 
-    ProductDto addProduct(ProductDto movieDto, MultipartFile file) throws IOException;
+    ProductDto addProduct(ProductDto productDto, MultipartFile file) throws IOException;
 
     ProductDto getProduct(Integer productId);
 
