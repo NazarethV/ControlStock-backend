@@ -41,15 +41,21 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductDto addProduct(ProductDto productDto, MultipartFile file) throws IOException {
-        //1- Cargar archivo (verifico si el nombre del archivo ya existe o no)
-        if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))){
-            throw new RuntimeException("File already exists: Please enter another file name!");
+        String uploadedFileName = null;
+
+       //VERIFICAR SI EXISTE O NO UN ARCHIVO
+        if(file != null && !file.isEmpty()) {
+            //1- Cargar archivo (verifico si el nombre del archivo ya existe o no)
+            if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
+                throw new RuntimeException("File already exists: Please enter another file name!");
+            }
+
+            uploadedFileName = fileService.uploadFile(path, file); //Para cargar el archivo hay que traer el método de servicio de archivos 'FileService'
+
+            //2- Pongo cómo nombre de archivo el valor del campo 'imageProduct'
+            productDto.setImage(uploadedFileName);//Pongo el nombre al archivo
         }
 
-        String uploadedFileName = fileService.uploadFile(path, file); //Para cargar el archivo hay que traer el método de servicio de archivos 'FileService'
-
-        //2- Pongo cómo nombre de archivo el valor del campo 'imageProduct'
-        productDto.setImage(uploadedFileName);//Pongo el nombre al archivo
 
         //3-Mapeo el producto DTO al objeto PRODUCT (ProductRepository guarda los datos en la DB y acepta objetos 'Product' por lo que es necesario mapearlo previamente)
         //Asigno el Obj DTO al Obj Product
@@ -61,7 +67,8 @@ public class ProductServiceImpl implements ProductService{
                 productDto.getStock(),
                 productDto.getCategory(),
                 productDto.getSupplier(),
-                productDto.getImage()
+                uploadedFileName  //Archivo/imagen en caso de que se cargue
+                //productDto.getImage()
         );
 
         //4- Guardo el nuevo Obj Product en la DB
