@@ -54,7 +54,7 @@ public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
 
 @PutMapping("/update/{productId}")   //En el BODY envío la info en la variable 'productDtoObj' y 'file'(para la imagen)
 public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
-                                                       @RequestPart MultipartFile file,
+                                                       @RequestPart(required = false) MultipartFile file,
                                                        @RequestPart String productDtoObj) throws IOException {
    if (file.isEmpty()) file = null;
    ProductDto productDto = convertToProductDto(productDtoObj);
