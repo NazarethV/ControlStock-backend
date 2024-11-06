@@ -75,7 +75,7 @@ public class ProductServiceImpl implements ProductService{
         Product savedProduct = productRepository.save(product);
 
         //5- Genero la URL para la imagen/archivo del producto
-        String imageUrl = baseUrl + "/file/" + uploadedFileName;
+        String imageUrl = uploadedFileName != null ? baseUrl + "/file/" + uploadedFileName;
 
         //6- Genero la respuesta que va a devolver este método (Mapeo lo del Obj Product al Obj DTO)
         return new ProductDto(
@@ -154,10 +154,10 @@ public class ProductServiceImpl implements ProductService{
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
 
         //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
-       String fileName = prod.getImage();
-       if (file != null) {
+       String fileName = prod.getImage(); //Nombre actual de la imagen
+       if (file != null && !file.isEmpty()) {
            Files.deleteIfExists(Paths.get(path + File.separator + fileName));
-           fileName = fileService.uploadFile(path, file);
+           fileName = fileService.uploadFile(path, file); //Cargar nuevo archivo
        }
 
        //3- Defino el nombre del archivo/imagen de ProductDto según el proceso anterior (fileName en el if)
@@ -178,8 +178,8 @@ public class ProductServiceImpl implements ProductService{
         //5- Guardo el Obj Product con los cambios actualizados
         Product updatedProduct = productRepository.save(product);
 
-        //6-Genero la URL de la imagen/archivo del producto
-        String imageUrl = baseUrl + "/file/" + fileName;
+        //6-Genero la URL de la imagen/archivo del producto en caso de ser necesario
+        String imageUrl = fileName != null ? baseUrl + "/file/" + fileName : null;
 
         //7- Retorno el DTO del producto como respuesta
         return new ProductDto(
