@@ -48,7 +48,7 @@ public class Product {
     @NotBlank(message = "Please provide product's supplier")
     private String supplier;
 
-
+    @Column(nullable = true) //Puede estar vacio
     private String image;
 }
 
