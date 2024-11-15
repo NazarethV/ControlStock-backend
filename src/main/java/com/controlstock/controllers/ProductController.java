@@ -28,7 +28,7 @@ public class ProductController {
 
 @PreAuthorize("hasAuthority('ADMIN')")   //Sólo el usuario ADMIN puede agregar los productos
 @PostMapping("/add-product")   //En el BODY envío la info en la variable 'productDto' y 'file'(para la imagen)
-public ResponseEntity<ProductDto> addProductHandler(@RequestPart(required = false) MultipartFile file, //ARCHIVO OPCIONAL
+public ResponseEntity<ProductDto> addProductHandler(@RequestParam(required = false) MultipartFile file, //@RequestPart  //ARCHIVO OPCIONAL
                                                     @RequestPart String productDto) throws IOException, EmptyFileException {
     //Las excepciones (en caso de que el archivo esté vacio)
     if (file.isEmpty()) {
@@ -54,7 +54,7 @@ public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
 
 @PutMapping("/update/{productId}")   //En el BODY envío la info en la variable 'productDtoObj' y 'file'(para la imagen)
 public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
-                                                       @RequestPart(required = false) MultipartFile file,
+                                                       @RequestPart MultipartFile file,
                                                        @RequestPart String productDtoObj) throws IOException {
    if (file.isEmpty()) file = null;
    ProductDto productDto = convertToProductDto(productDtoObj);

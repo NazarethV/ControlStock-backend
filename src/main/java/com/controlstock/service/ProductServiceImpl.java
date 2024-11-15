@@ -41,20 +41,17 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductDto addProduct(ProductDto productDto, MultipartFile file) throws IOException {
-        String uploadedFileName = null;
 
-       //VERIFICAR SI EXISTE O NO UN ARCHIVO
-        if(file != null && !file.isEmpty()) {
-            //1- Cargar archivo (verifico si el nombre del archivo ya existe o no)
-            if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
-                throw new RuntimeException("File already exists: Please enter another file name!");
-            }
-
-            uploadedFileName = fileService.uploadFile(path, file); //Para cargar el archivo hay que traer el método de servicio de archivos 'FileService'
-
-            //2- Pongo cómo nombre de archivo el valor del campo 'imageProduct'
-            productDto.setImage(uploadedFileName);//Pongo el nombre al archivo
+        //1- Cargar archivo (verifico si el nombre del archivo ya existe o no)
+        if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
+            throw new RuntimeException("File already exists: Please enter another file name!");
         }
+
+        String uploadedFileName = fileService.uploadFile(path, file); //Para cargar el archivo hay que traer el método de servicio de archivos 'FileService'
+
+        //2- Pongo cómo nombre de archivo el valor del campo 'imageProduct'
+        productDto.setImage(uploadedFileName);//Pongo el nombre al archivo
+
 
 
         //3-Mapeo el producto DTO al objeto PRODUCT (ProductRepository guarda los datos en la DB y acepta objetos 'Product' por lo que es necesario mapearlo previamente)
@@ -67,15 +64,14 @@ public class ProductServiceImpl implements ProductService{
                 productDto.getStock(),
                 productDto.getCategory(),
                 productDto.getSupplier(),
-                uploadedFileName  //Archivo/imagen en caso de que se cargue
-                //productDto.getImage()
+                productDto.getImage()
         );
 
         //4- Guardo el nuevo Obj Product en la DB
         Product savedProduct = productRepository.save(product);
 
         //5- Genero la URL para la imagen/archivo del producto
-        String imageUrl = uploadedFileName != null ? baseUrl + "/file/" + uploadedFileName;
+        String imageUrl = baseUrl + "/file/" + uploadedFileName;
 
         //6- Genero la respuesta que va a devolver este método (Mapeo lo del Obj Product al Obj DTO)
         return new ProductDto(
@@ -155,7 +151,7 @@ public class ProductServiceImpl implements ProductService{
 
         //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
        String fileName = prod.getImage(); //Nombre actual de la imagen
-       if (file != null && !file.isEmpty()) {
+       if (file != null) {
            Files.deleteIfExists(Paths.get(path + File.separator + fileName));
            fileName = fileService.uploadFile(path, file); //Cargar nuevo archivo
        }
@@ -179,7 +175,7 @@ public class ProductServiceImpl implements ProductService{
         Product updatedProduct = productRepository.save(product);
 
         //6-Genero la URL de la imagen/archivo del producto en caso de ser necesario
-        String imageUrl = fileName != null ? baseUrl + "/file/" + fileName : null;
+        String imageUrl = baseUrl + "/file/" + fileName;
 
         //7- Retorno el DTO del producto como respuesta
         return new ProductDto(
