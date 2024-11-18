@@ -33,6 +33,7 @@ public class ProductServiceImpl implements ProductService{
         this.fileService = fileService;
     }
 
+    //@Value("${project.imageProduct}")
     @Value("${project.imageProduct}")
     private String path; //Saqué la url de las imágenes/archivos de los productos ("imageProduct/")
 
@@ -143,24 +144,68 @@ public class ProductServiceImpl implements ProductService{
     }
 
 
-    @Override
-    public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
-        //1- Compruebo que el Product exista en la DB
+    //    @Override
+//    public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
+//        //1- Compruebo que el Product exista en la DB
+//        Product prod = productRepository.findById(productId)
+//                .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
+//
+//        //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
+//       String fileName = prod.getImage(); //Nombre actual de la imagen
+//       if (file != null) {
+//           Files.deleteIfExists(Paths.get(path + File.separator + fileName));
+//           fileName = fileService.uploadFile(path, file); //Cargar nuevo archivo
+//       }
+//
+//       //3- Defino el nombre del archivo/imagen de ProductDto según el proceso anterior (fileName en el if)
+//        productDto.setImage(fileName);
+//
+//       //4-Asigno el cambio/actualización al objeto Movie
+//        Product product = new Product(
+//                prod.getProductId(),
+//                productDto.getName(),
+//                productDto.getDescription(),
+//                productDto.getPrice(),
+//                productDto.getStock(),
+//                productDto.getCategory(),
+//                productDto.getSupplier(),
+//                productDto.getImage()
+//        );
+//
+//        //5- Guardo el Obj Product con los cambios actualizados
+//        Product updatedProduct = productRepository.save(product);
+//
+//        //6-Genero la URL de la imagen/archivo del producto en caso de ser necesario
+//        String imageUrl = baseUrl + "/file/" + fileName;
+//
+//        //7- Retorno el DTO del producto como respuesta
+//        return new ProductDto(
+//                product.getProductId(),
+//                product.getName(),
+//                product.getDescription(),
+//                product.getPrice(),
+//                product.getStock(),
+//                product.getCategory(),
+//                product.getSupplier(),
+//                product.getImage(),
+//                imageUrl
+//        );
+//    }
+
+
+@Override
+public ProductDto updateProduct(Integer productId, ProductDto productDto, String imageName) throws IOException {
         Product prod = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
 
-        //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
-       String fileName = prod.getImage(); //Nombre actual de la imagen
-       if (file != null) {
-           Files.deleteIfExists(Paths.get(path + File.separator + fileName));
-           fileName = fileService.uploadFile(path, file); //Cargar nuevo archivo
-       }
+        // Si se proporciona una nueva imagen, procesarla
+        if (imageName != null && !imageName.equals(prod.getImage())) {
+            // Eliminar la imagen anterior si es necesario
+            Files.deleteIfExists(Paths.get(path + File.separator + prod.getImage()));
+        }
 
-       //3- Defino el nombre del archivo/imagen de ProductDto según el proceso anterior (fileName en el if)
-        productDto.setImage(fileName);
-
-       //4-Asigno el cambio/actualización al objeto Movie
-        Product product = new Product(
+        // Crear y guardar el producto actualizado
+        Product updatedProduct = new Product(
                 prod.getProductId(),
                 productDto.getName(),
                 productDto.getDescription(),
@@ -168,29 +213,24 @@ public class ProductServiceImpl implements ProductService{
                 productDto.getStock(),
                 productDto.getCategory(),
                 productDto.getSupplier(),
-                productDto.getImage()
+                imageName  // Usar el nombre de la imagen nueva o la anterior
         );
 
-        //5- Guardo el Obj Product con los cambios actualizados
-        Product updatedProduct = productRepository.save(product);
+        Product savedProduct = productRepository.save(updatedProduct);
+        String imageUrl = baseUrl + "/file/" + imageName; // Crear la URL de la imagen
 
-        //6-Genero la URL de la imagen/archivo del producto en caso de ser necesario
-        String imageUrl = baseUrl + "/file/" + fileName;
-
-        //7- Retorno el DTO del producto como respuesta
         return new ProductDto(
-                product.getProductId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getStock(),
-                product.getCategory(),
-                product.getSupplier(),
-                product.getImage(),
+                savedProduct.getProductId(),
+                savedProduct.getName(),
+                savedProduct.getDescription(),
+                savedProduct.getPrice(),
+                savedProduct.getStock(),
+                savedProduct.getCategory(),
+                savedProduct.getSupplier(),
+                savedProduct.getImage(),
                 imageUrl
         );
     }
-
 
     @Override
     public String deleteProduct(Integer productId) throws IOException {

@@ -20,9 +20,11 @@ public class FileController {
     private final FileService fileService;
 
     public FileController(FileService fileService) {
+
         this.fileService = fileService;
     }
 
+    //@Value("${project.imageProduct}")
     @Value("${project.imageProduct}")
     private String path;
 
