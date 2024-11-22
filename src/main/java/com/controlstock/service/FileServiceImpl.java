@@ -14,18 +14,31 @@ public class FileServiceImpl implements FileService{
     @Override
     public String uploadFile(String path, MultipartFile file) throws IOException {
 
-        String fileName = file.getOriginalFilename();
+        //String fileName = file.getOriginalFilename();
+        //String filePath = path + File.separator + fileName;
+        //File f = new File(path);
+        //if(!f.exists()){
+            //f.mkdir(); // mkdir: sirve para crear un nuevo directorio en el sistema de archivos. Si el directorio ya existe, no hace nada
+        //}
 
-        String filePath = path + File.separator + fileName;
+        // Generar un nombre único usando UUID
+        String originalFileName = file.getOriginalFilename();
+        String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
 
-        File f = new File(path);
-        if(!f.exists()){
-            f.mkdir(); // mkdir: sirve para crear un nuevo directorio en el sistema de archivos. Si el directorio ya existe, no hace nada
+        // Crear el directorio si no existe
+        File directory = new File(path);
+        if (!directory.exists()) {
+            directory.mkdir();
         }
 
+        // Construir la ruta completa del archivo
+        String filePath = path + File.separator + uniqueFileName;
+
+        // Guardar el archivo en la ubicación especificada
         Files.copy(file.getInputStream(), Paths.get(filePath));
 
-        return fileName;
+        //return fileName;
+        return uniqueFileName;
     }
 
 
