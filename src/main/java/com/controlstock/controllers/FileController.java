@@ -37,7 +37,7 @@ public class FileController {
     @GetMapping("/{fileName}")
     public void serveFileHandler(@PathVariable String fileName, HttpServletResponse response) throws IOException {
         InputStream resourceFile = fileService.getResourceFile(path, fileName);
-        response.setContentType(MediaType.ALL_VALUE); //MediaType.IMAGE_PNG_VALUE
+        response.setContentType(MediaType.IMAGE_PNG_VALUE); //MediaType.ALL_VALUE
         StreamUtils.copy(resourceFile, response.getOutputStream());
     }
 
