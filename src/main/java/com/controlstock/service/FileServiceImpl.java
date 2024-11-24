@@ -19,26 +19,17 @@ public class FileServiceImpl implements FileService{
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Cannot upload an empty file");
         }
-        //String fileName = file.getOriginalFilename();
-        //String filePath = path + File.separator + fileName;
-        //File f = new File(path);
-        //if(!f.exists()){
-            //f.mkdir(); // mkdir: sirve para crear un nuevo directorio en el sistema de archivos. Si el directorio ya existe, no hace nada
-        //}
 
         // Generar un nombre único usando UUID
         String originalFileName = file.getOriginalFilename();
         String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
 
-
-        ///////////////////////7
         // Validar extensión permitida
         List<String> allowedExtensions = List.of("jpg", "jpeg", "png", "gif");
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
         if (!allowedExtensions.contains(fileExtension)) {
             throw new IllegalArgumentException("Invalid file type. Only JPG, JPEG, PNG, and GIF are allowed.");
         }
-        //////////////////////
 
 
         // Crear el directorio si no existe
@@ -47,15 +38,7 @@ public class FileServiceImpl implements FileService{
             directory.mkdirs(); //O mkdir
         }
 
-        // Construir la ruta completa del archivo
-        //String filePath = path + File.separator + uniqueFileName;
-        Path filePath = Paths.get(path + File.separator + uniqueFileName);
-        Files.copy(file.getInputStream(), filePath);
 
-        // Guardar el archivo en la ubicación especificada
-        //Files.copy(file.getInputStream(), Paths.get(filePath));
-
-        //return fileName;
         return uniqueFileName;
     }
 
