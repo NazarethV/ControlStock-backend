@@ -17,8 +17,6 @@ public interface ProductService {
 
     ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException;
 
-    //ProductDto updateProduct(Integer productId, ProductDto productDto, String imageName) throws IOException;
-
     String deleteProduct(Integer productId) throws IOException;
 
     ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize);

@@ -153,14 +153,6 @@ public class ProductServiceImpl implements ProductService{
 
         String imageName = existingProduct.getImage(); // Imagen existente por defecto
 
-        // Procesar nueva imagen si se proporciona
-       /* if (file != null && !file.isEmpty()) {
-            imageName = fileService.uploadFile(path, file);
-
-            // Eliminar la imagen anterior
-            Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
-            Files.deleteIfExists(oldImagePath);
-        }*/
 
         if (file != null && !file.isEmpty()) {
             // Subir el nuevo archivo
