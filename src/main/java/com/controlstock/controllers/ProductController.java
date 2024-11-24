@@ -26,18 +26,16 @@ public class ProductController {
 
     private final ProductService productService;
     private final ProductRepository productRepository;
-   //Agregado:
+
     private final FileService fileService; // Inyección de dependencias de FileService
 
 
     public ProductController(ProductService productService, ProductRepository productRepository, FileService fileService) {
         this.productService = productService;
         this.productRepository = productRepository;
-        //Agregado:
         this.fileService = fileService;
     }
 
-    //AGREGADO:
     // Inyectamos 'path' desde el archivo de configuración
     @Value("${project.imageProduct}")
     private String path;
@@ -69,7 +67,6 @@ public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
         return ResponseEntity.ok(productService.getAllProducts());
 }
 
-////////////////////////////////////////
 @PutMapping("/update/{productId}")   //En el BODY envío la info en la variable 'productDtoObj' y 'file'(para la imagen)
 public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
                                                        @RequestPart(required = false) MultipartFile file,
@@ -81,30 +78,6 @@ public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer pro
    ProductDto productDto = convertToProductDto(productDtoObj);
    return ResponseEntity.ok(productService.updateProduct(productId, productDto, file));
 }
-
-    /*@PutMapping("/update/{productId}")
-    public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
-                                                           @RequestPart(required = false) MultipartFile file,  // Hacer archivo opcional
-                                                           @RequestPart String productDtoObj) throws IOException {
-
-        ProductDto productDto = convertToProductDto(productDtoObj);
-        String imageName = null;
-
-        if (file != null && !file.isEmpty()) {
-            // Si el archivo no está vacío, procesar la nueva imagen
-            imageName = fileService.uploadFile(path, file);
-        }
-        // Si no se proporciona imagen, se mantiene la imagen anterior
-        if (imageName == null) {
-            // Recuperamos la imagen anterior del producto, si no hay archivo nuevo
-            Product existingProduct = productRepository.findById(productId)
-                    .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
-            imageName = existingProduct.getImage();
-        }
-
-        return ResponseEntity.ok(productService.updateProduct(productId, productDto, imageName));
-    }*/
-
 
 
 @DeleteMapping("/delete/{productId}")

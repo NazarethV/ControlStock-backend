@@ -25,7 +25,6 @@ public class FileController {
     }
 
     @Value("${project.imageProduct}")
-    //@Value("${project.imageProduct}")
     private String path;
 
     @PostMapping("/upload")
