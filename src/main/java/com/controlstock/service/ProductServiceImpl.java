@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,69 +145,40 @@ public class ProductServiceImpl implements ProductService{
     }
 
 
-    //    @Override
-//    public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
-//        //1- Compruebo que el Product exista en la DB
-//        Product prod = productRepository.findById(productId)
-//                .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
-//
-//        //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
-//       String fileName = prod.getImage(); //Nombre actual de la imagen
-//       if (file != null) {
-//           Files.deleteIfExists(Paths.get(path + File.separator + fileName));
-//           fileName = fileService.uploadFile(path, file); //Cargar nuevo archivo
-//       }
-//
-//       //3- Defino el nombre del archivo/imagen de ProductDto según el proceso anterior (fileName en el if)
-//        productDto.setImage(fileName);
-//
-//       //4-Asigno el cambio/actualización al objeto Movie
-//        Product product = new Product(
-//                prod.getProductId(),
-//                productDto.getName(),
-//                productDto.getDescription(),
-//                productDto.getPrice(),
-//                productDto.getStock(),
-//                productDto.getCategory(),
-//                productDto.getSupplier(),
-//                productDto.getImage()
-//        );
-//
-//        //5- Guardo el Obj Product con los cambios actualizados
-//        Product updatedProduct = productRepository.save(product);
-//
-//        //6-Genero la URL de la imagen/archivo del producto en caso de ser necesario
-//        String imageUrl = baseUrl + "/file/" + fileName;
-//
-//        //7- Retorno el DTO del producto como respuesta
-//        return new ProductDto(
-//                product.getProductId(),
-//                product.getName(),
-//                product.getDescription(),
-//                product.getPrice(),
-//                product.getStock(),
-//                product.getCategory(),
-//                product.getSupplier(),
-//                product.getImage(),
-//                imageUrl
-//        );
-//    }
 
-
-@Override
-public ProductDto updateProduct(Integer productId, ProductDto productDto, String imageName) throws IOException {
-        Product prod = productRepository.findById(productId)
+    @Override
+    public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
+        Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
 
-        // Si se proporciona una nueva imagen, procesarla
-        if (imageName != null && !imageName.equals(prod.getImage())) {
-            // Eliminar la imagen anterior si es necesario
-            Files.deleteIfExists(Paths.get(path + File.separator + prod.getImage()));
+        String imageName = existingProduct.getImage(); // Imagen existente por defecto
+
+        // Procesar nueva imagen si se proporciona
+       /* if (file != null && !file.isEmpty()) {
+            imageName = fileService.uploadFile(path, file);
+
+            // Eliminar la imagen anterior
+            Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
+            Files.deleteIfExists(oldImagePath);
+        }*/
+
+        if (file != null && !file.isEmpty()) {
+            // Subir el nuevo archivo
+            String uploadedFileName = fileService.uploadFile(path, file);
+
+            // Eliminar la imagen anterior si existe
+            Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
+            if (Files.exists(oldImagePath)) {
+                Files.delete(oldImagePath);
+            }
+
+            // Actualizar el nombre de la imagen
+            imageName = uploadedFileName;
         }
 
         // Crear y guardar el producto actualizado
         Product updatedProduct = new Product(
-                prod.getProductId(),
+                productId,//productDto.getProductId(),
                 productDto.getName(),
                 productDto.getDescription(),
                 productDto.getPrice(),
@@ -216,9 +188,13 @@ public ProductDto updateProduct(Integer productId, ProductDto productDto, String
                 imageName  // Usar el nombre de la imagen nueva o la anterior
         );
 
+        // Guardar cambios
         Product savedProduct = productRepository.save(updatedProduct);
-        String imageUrl = baseUrl + "/file/" + imageName; // Crear la URL de la imagen
 
+        // Generar URL para la imagen
+        String imageUrl = baseUrl + "/file/" + imageName;
+
+        // Retornar DTO actualizado
         return new ProductDto(
                 savedProduct.getProductId(),
                 savedProduct.getName(),
@@ -231,6 +207,7 @@ public ProductDto updateProduct(Integer productId, ProductDto productDto, String
                 imageUrl
         );
     }
+
 
     @Override
     public String deleteProduct(Integer productId) throws IOException {

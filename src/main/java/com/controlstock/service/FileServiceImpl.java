@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +16,9 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public String uploadFile(String path, MultipartFile file) throws IOException {
-
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Cannot upload an empty file");
+        }
         //String fileName = file.getOriginalFilename();
         //String filePath = path + File.separator + fileName;
         //File f = new File(path);
@@ -27,14 +30,6 @@ public class FileServiceImpl implements FileService{
         String originalFileName = file.getOriginalFilename();
         String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
 
-        // Crear el directorio si no existe
-        File directory = new File(path);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-
-        // Construir la ruta completa del archivo
-        String filePath = path + File.separator + uniqueFileName;
 
         ///////////////////////7
         // Validar extensión permitida
@@ -45,8 +40,20 @@ public class FileServiceImpl implements FileService{
         }
         //////////////////////
 
+
+        // Crear el directorio si no existe
+        File directory = new File(path);
+        if (!directory.exists()) {
+            directory.mkdirs(); //O mkdir
+        }
+
+        // Construir la ruta completa del archivo
+        //String filePath = path + File.separator + uniqueFileName;
+        Path filePath = Paths.get(path + File.separator + uniqueFileName);
+        Files.copy(file.getInputStream(), filePath);
+
         // Guardar el archivo en la ubicación especificada
-        Files.copy(file.getInputStream(), Paths.get(filePath));
+        //Files.copy(file.getInputStream(), Paths.get(filePath));
 
         //return fileName;
         return uniqueFileName;

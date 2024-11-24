@@ -24,8 +24,8 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    //@Value("${project.imageProduct}")
     @Value("${project.imageProduct}")
+    //@Value("${project.imageProduct}")
     private String path;
 
     @PostMapping("/upload")
@@ -40,5 +40,4 @@ public class FileController {
         response.setContentType(MediaType.IMAGE_PNG_VALUE); //MediaType.ALL_VALUE
         StreamUtils.copy(resourceFile, response.getOutputStream());
     }
-
 }

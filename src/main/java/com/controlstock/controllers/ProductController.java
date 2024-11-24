@@ -39,7 +39,7 @@ public class ProductController {
 
     //AGREGADO:
     // Inyectamos 'path' desde el archivo de configuración
-    @Value("{project.imageProduct}")
+    @Value("${project.imageProduct}")
     private String path;
 
 
@@ -70,20 +70,22 @@ public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
 }
 
 ////////////////////////////////////////
-//@PutMapping("/update/{productId}")   //En el BODY envío la info en la variable 'productDtoObj' y 'file'(para la imagen)
-//public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
-//                                                       @RequestPart MultipartFile file,
-//                                                       @RequestPart String productDtoObj) throws IOException {
-//   if (file.isEmpty()) file = null;
-//   ProductDto productDto = convertToProductDto(productDtoObj);
-//   return ResponseEntity.ok(productService.updateProduct(productId, productDto, file));
-//}
+@PutMapping("/update/{productId}")   //En el BODY envío la info en la variable 'productDtoObj' y 'file'(para la imagen)
+public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
+                                                       @RequestPart(required = false) MultipartFile file,
+                                                       @RequestPart String productDtoObj) throws IOException {
+   if (file != null && file.isEmpty()) {
+       file = null;
+   }
 
-    @PutMapping("/update/{productId}")
+   ProductDto productDto = convertToProductDto(productDtoObj);
+   return ResponseEntity.ok(productService.updateProduct(productId, productDto, file));
+}
+
+    /*@PutMapping("/update/{productId}")
     public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer productId,
                                                            @RequestPart(required = false) MultipartFile file,  // Hacer archivo opcional
                                                            @RequestPart String productDtoObj) throws IOException {
-
 
         ProductDto productDto = convertToProductDto(productDtoObj);
         String imageName = null;
@@ -101,7 +103,7 @@ public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
         }
 
         return ResponseEntity.ok(productService.updateProduct(productId, productDto, imageName));
-    }
+    }*/
 
 
 
