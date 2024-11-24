@@ -38,6 +38,9 @@ public class FileServiceImpl implements FileService{
             directory.mkdirs(); //O mkdir
         }
 
+        Path filePath = Paths.get(path + File.separator + uniqueFileName);
+        Files.copy(file.getInputStream(), filePath);
+
 
         return uniqueFileName;
     }

@@ -158,11 +158,20 @@ public class ProductServiceImpl implements ProductService{
             // Subir el nuevo archivo
             String uploadedFileName = fileService.uploadFile(path, file);
 
-            // Eliminar la imagen anterior si existe
-            Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
-            if (Files.exists(oldImagePath)) {
-                Files.delete(oldImagePath);
+            //Eliminar la imagen anterior si existe
+            if (existingProduct.getImage() != null) {
+                Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
+                try {
+                    Files.deleteIfExists(oldImagePath);
+                }catch (IOException e) {
+                    System.err.println("Failed to delete old image: " + e.getMessage());
+                }
             }
+            // Eliminar la imagen anterior si existe
+            //Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
+            //if (Files.exists(oldImagePath)) {
+            //    Files.delete(oldImagePath);
+            //}
 
             // Actualizar el nombre de la imagen
             imageName = uploadedFileName;
