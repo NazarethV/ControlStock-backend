@@ -24,12 +24,14 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest registerRequest) {
+        //Para elegir el rol de usuario
+        UserRole role = registerRequest.getRole() != null ? registerRequest.getRole() : UserRole.USER;
         var user = User.builder()
                 .name(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(UserRole.USER)
+                .role(role) //Se asigna el rol seleccionado o por defecto es USER
                 .build();
 
         User savedUser = userRepository.save(user);
