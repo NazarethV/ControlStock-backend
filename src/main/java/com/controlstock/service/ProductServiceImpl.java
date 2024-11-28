@@ -217,25 +217,19 @@ public class ProductServiceImpl implements ProductService{
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
         //Si se encuentra el Product en la DB, se guarda el ID
         Integer id = prod.getProductId();
-
         //2- Se elimina primero el archivo asociado al Obj Product que se quiere eliminar
         Files.deleteIfExists(Paths.get(path + File.separator + prod.getImage()));
-
         //3- Elimino el Obj Prod del repositorio (es decir de la base de datos)
         productRepository.delete(prod);
-
         return "Product deleted with id = " + id;
     }
-
 
     @Override
     public ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize) {
         //Pageable: Interfaz para la configuración del PAGINADO
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-
         Page<Product> productPages = productRepository.findAll(pageable);
         List<Product> products = productPages.getContent();
-
         List<ProductDto> productDtos = new ArrayList<>();
 
         for (Product product : products) {
@@ -291,8 +285,6 @@ public class ProductServiceImpl implements ProductService{
                 productPages.isLast()
         );
     }
-
-
 }
 
 

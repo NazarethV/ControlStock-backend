@@ -23,12 +23,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/product")
 public class ProductController {
-
     private final ProductService productService;
     private final ProductRepository productRepository;
-
     private final FileService fileService; // Inyección de dependencias de FileService
-
 
     public ProductController(ProductService productService, ProductRepository productRepository, FileService fileService) {
         this.productService = productService;
@@ -39,7 +36,6 @@ public class ProductController {
     // Inyectamos 'path' desde el archivo de configuración
     @Value("${project.imageProduct}")
     private String path;
-
 
 @PreAuthorize("hasAuthority('ADMIN')")   //Sólo el usuario ADMIN puede agregar los productos
 @PostMapping("/add-product")   //En el BODY envío la info en la variable 'productDto' y 'file'(para la imagen)
@@ -61,7 +57,6 @@ public ResponseEntity<ProductDto> getProductHandler(@PathVariable Integer produc
         return ResponseEntity.ok(productService.getProduct(productId));
 }
 
-
 @GetMapping("/all")
 public ResponseEntity<List<ProductDto>> getAllProductsHandler() {
         return ResponseEntity.ok(productService.getAllProducts());
@@ -79,12 +74,10 @@ public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer pro
    return ResponseEntity.ok(productService.updateProduct(productId, productDto, file));
 }
 
-
 @DeleteMapping("/delete/{productId}")
 public ResponseEntity<String> deleteProductHandler(@PathVariable Integer productId) throws IOException {
         return ResponseEntity.ok(productService.deleteProduct(productId));
 }
-
 
 @GetMapping("/allProductsPage")
 public ResponseEntity<ProductPageResponse> getProductsWithPagination(
@@ -93,7 +86,6 @@ public ResponseEntity<ProductPageResponse> getProductsWithPagination(
 ){
         return ResponseEntity.ok(productService.getAllProductsWithPagination(pageNumber, pageSize));
 }
-
 
 @GetMapping("/allProductsPageSort")
 public ResponseEntity<ProductPageResponse> getProductsWithPaginationAndSorting(
@@ -104,7 +96,6 @@ public ResponseEntity<ProductPageResponse> getProductsWithPaginationAndSorting(
 ) {
        return ResponseEntity.ok(productService.getAllProductsWithPaginationAndSorting(pageNumber, pageSize, sortBy, dir));
 }
-
 
 //Método Genérico para la CONVERSIÓN del Obj Product
 private ProductDto convertToProductDto(String productDtoObj) throws JsonProcessingException {

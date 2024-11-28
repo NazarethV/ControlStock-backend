@@ -30,7 +30,6 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-
     //Extraigo la información del JWT
     private Claims extractAllClaims(String token) {
         return Jwts
@@ -41,14 +40,12 @@ public class JwtService {
                 .getBody();
     }
 
-
     // Decodifico y obtengo la Clave/Key
     private Key getSignInKey() {
         //decode SECRET_KEY
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
 
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
@@ -69,18 +66,15 @@ public class JwtService {
                 .compact();
     }
 
-
     // if token is valid by checking if token is expired for current user
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
     // if token is expired
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
-
     // get expiration date from token
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
