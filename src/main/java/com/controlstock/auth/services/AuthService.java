@@ -60,6 +60,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getRefreshToken())
+                .role(user.getRole())
                 .build();
     }
 
