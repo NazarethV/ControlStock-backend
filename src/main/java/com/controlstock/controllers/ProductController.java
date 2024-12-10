@@ -74,6 +74,7 @@ public ResponseEntity<ProductDto> updateProductHandler(@PathVariable Integer pro
    return ResponseEntity.ok(productService.updateProduct(productId, productDto, file));
 }
 
+//@PreAuthorize("hasAuthority('ADMIN')")
 @DeleteMapping("/delete/{productId}")
 public ResponseEntity<String> deleteProductHandler(@PathVariable Integer productId) throws IOException {
         return ResponseEntity.ok(productService.deleteProduct(productId));

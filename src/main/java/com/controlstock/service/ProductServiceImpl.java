@@ -5,6 +5,7 @@ import com.controlstock.dto.ProductDto;
 import com.controlstock.dto.ProductPageResponse;
 import com.controlstock.entities.Product;
 import com.controlstock.repositories.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,11 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -209,8 +213,35 @@ public class ProductServiceImpl implements ProductService{
         );
     }
 
-
     @Override
+    public String deleteProduct(Integer productId) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            String filePath = product.getImage();
+            try {
+                Path path = Paths.get(filePath);
+                if (Files.exists(path)) {
+                    try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)){
+                        channel.close();
+                    }catch (IOException e) {
+                        System.err.println("NO SE PUDO LIBERAR EL ARCHIVO" + e.getMessage());
+                    }
+                    Files.deleteIfExists(path);
+                }
+            }catch (IOException e){
+                throw new RuntimeException("Erro al eliminar el archivo del producto");
+            }
+
+            productRepository.delete(product);
+            return "Producto eliminado: " + productId;
+        } else {
+            throw new EntityNotFoundException("Product con ID " + productId + "no encontrado");
+        }
+
+    }
+
+   /*@Override
     public String deleteProduct(Integer productId) throws IOException {
         //1- Verifico si el producto existe en la DB
         Product prod = productRepository.findById(productId)
@@ -222,7 +253,9 @@ public class ProductServiceImpl implements ProductService{
         //3- Elimino el Obj Prod del repositorio (es decir de la base de datos)
         productRepository.delete(prod);
         return "Product deleted with id = " + id;
-    }
+    }*/
+
+
 
     @Override
     public ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize) {
