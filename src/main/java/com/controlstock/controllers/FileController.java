@@ -20,6 +20,7 @@ public class FileController {
     private final FileService fileService;
 
     public FileController(FileService fileService) {
+
         this.fileService = fileService;
     }
 
@@ -32,12 +33,10 @@ public class FileController {
         return ResponseEntity.ok("File uploaded: " + uploadedFileName);
     }
 
-
     @GetMapping("/{fileName}")
     public void serveFileHandler(@PathVariable String fileName, HttpServletResponse response) throws IOException {
         InputStream resourceFile = fileService.getResourceFile(path, fileName);
-        response.setContentType(MediaType.IMAGE_PNG_VALUE);
+        response.setContentType(MediaType.IMAGE_PNG_VALUE); //MediaType.ALL_VALUE
         StreamUtils.copy(resourceFile, response.getOutputStream());
     }
-
 }

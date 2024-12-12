@@ -1,5 +1,6 @@
 package com.controlstock.auth.utils;
 
+import com.controlstock.auth.entities.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,5 @@ public class RegisterRequest {
     private String email;
     private String username;
     private String password;
+    private UserRole role;
 }

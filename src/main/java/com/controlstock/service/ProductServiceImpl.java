@@ -5,6 +5,7 @@ import com.controlstock.dto.ProductDto;
 import com.controlstock.dto.ProductPageResponse;
 import com.controlstock.entities.Product;
 import com.controlstock.repositories.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,10 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -33,6 +38,7 @@ public class ProductServiceImpl implements ProductService{
         this.fileService = fileService;
     }
 
+    //@Value("${project.imageProduct}")
     @Value("${project.imageProduct}")
     private String path; //Saqué la url de las imágenes/archivos de los productos ("imageProduct/")
 
@@ -41,8 +47,9 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductDto addProduct(ProductDto productDto, MultipartFile file) throws IOException {
+
         //1- Cargar archivo (verifico si el nombre del archivo ya existe o no)
-        if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))){
+        if (Files.exists(Paths.get(path + File.separator + file.getOriginalFilename()))) {
             throw new RuntimeException("File already exists: Please enter another file name!");
         }
 
@@ -50,6 +57,8 @@ public class ProductServiceImpl implements ProductService{
 
         //2- Pongo cómo nombre de archivo el valor del campo 'imageProduct'
         productDto.setImage(uploadedFileName);//Pongo el nombre al archivo
+
+
 
         //3-Mapeo el producto DTO al objeto PRODUCT (ProductRepository guarda los datos en la DB y acepta objetos 'Product' por lo que es necesario mapearlo previamente)
         //Asigno el Obj DTO al Obj Product
@@ -140,81 +149,120 @@ public class ProductServiceImpl implements ProductService{
     }
 
 
+
     @Override
     public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
-        //1- Compruebo que el Product exista en la DB
-        Product prod = productRepository.findById(productId)
+        Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
 
-        //2-Verifico si hay un nuevo archivo/imagen para reemplazar al antiguo (Si hay, borro el viejo y guardo el nuevo, si no hay no hago nada)
-       String fileName = prod.getImage();
-       if (file != null) {
-           Files.deleteIfExists(Paths.get(path + File.separator + fileName));
-           fileName = fileService.uploadFile(path, file);
-       }
+        String imageName = existingProduct.getImage(); // Imagen existente por defecto
 
-       //3- Defino el nombre del archivo/imagen de ProductDto según el proceso anterior (fileName en el if)
-        productDto.setImage(fileName);
 
-       //4-Asigno el cambio/actualización al objeto Movie
-        Product product = new Product(
-                prod.getProductId(),
+        if (file != null && !file.isEmpty()) {
+            // Subir el nuevo archivo
+            String uploadedFileName = fileService.uploadFile(path, file);
+
+            //Eliminar la imagen anterior si existe
+            if (existingProduct.getImage() != null) {
+                Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
+                try {
+                    Files.deleteIfExists(oldImagePath);
+                }catch (IOException e) {
+                    System.err.println("Failed to delete old image: " + e.getMessage());
+                }
+            }
+            // Eliminar la imagen anterior si existe
+            //Path oldImagePath = Paths.get(path + File.separator + existingProduct.getImage());
+            //if (Files.exists(oldImagePath)) {
+            //    Files.delete(oldImagePath);
+            //}
+
+            // Actualizar el nombre de la imagen
+            imageName = uploadedFileName;
+        }
+
+        // Crear y guardar el producto actualizado
+        Product updatedProduct = new Product(
+                productId,//productDto.getProductId(),
                 productDto.getName(),
                 productDto.getDescription(),
                 productDto.getPrice(),
                 productDto.getStock(),
                 productDto.getCategory(),
                 productDto.getSupplier(),
-                productDto.getImage()
+                imageName  // Usar el nombre de la imagen nueva o la anterior
         );
 
-        //5- Guardo el Obj Product con los cambios actualizados
-        Product updatedProduct = productRepository.save(product);
+        // Guardar cambios
+        Product savedProduct = productRepository.save(updatedProduct);
 
-        //6-Genero la URL de la imagen/archivo del producto
-        String imageUrl = baseUrl + "/file/" + fileName;
+        // Generar URL para la imagen
+        String imageUrl = baseUrl + "/file/" + imageName;
 
-        //7- Retorno el DTO del producto como respuesta
+        // Retornar DTO actualizado
         return new ProductDto(
-                product.getProductId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getStock(),
-                product.getCategory(),
-                product.getSupplier(),
-                product.getImage(),
+                savedProduct.getProductId(),
+                savedProduct.getName(),
+                savedProduct.getDescription(),
+                savedProduct.getPrice(),
+                savedProduct.getStock(),
+                savedProduct.getCategory(),
+                savedProduct.getSupplier(),
+                savedProduct.getImage(),
                 imageUrl
         );
     }
 
-
     @Override
+    public String deleteProduct(Integer productId) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            String filePath = product.getImage();
+            try {
+                Path path = Paths.get(filePath);
+                if (Files.exists(path)) {
+                    try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)){
+                        channel.close();
+                    }catch (IOException e) {
+                        System.err.println("NO SE PUDO LIBERAR EL ARCHIVO" + e.getMessage());
+                    }
+                    Files.deleteIfExists(path);
+                }
+            }catch (IOException e){
+                throw new RuntimeException("Erro al eliminar el archivo del producto");
+            }
+
+            productRepository.delete(product);
+            return "Producto eliminado: " + productId;
+        } else {
+            throw new EntityNotFoundException("Product con ID " + productId + "no encontrado");
+        }
+
+    }
+
+   /*@Override
     public String deleteProduct(Integer productId) throws IOException {
         //1- Verifico si el producto existe en la DB
         Product prod = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
         //Si se encuentra el Product en la DB, se guarda el ID
         Integer id = prod.getProductId();
-
         //2- Se elimina primero el archivo asociado al Obj Product que se quiere eliminar
         Files.deleteIfExists(Paths.get(path + File.separator + prod.getImage()));
-
         //3- Elimino el Obj Prod del repositorio (es decir de la base de datos)
         productRepository.delete(prod);
-
         return "Product deleted with id = " + id;
-    }
+    }*/
+
 
 
     @Override
     public ProductPageResponse getAllProductsWithPagination(Integer pageNumber, Integer pageSize) {
         //Pageable: Interfaz para la configuración del PAGINADO
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-
         Page<Product> productPages = productRepository.findAll(pageable);
         List<Product> products = productPages.getContent();
-
         List<ProductDto> productDtos = new ArrayList<>();
 
         for (Product product : products) {
@@ -270,8 +318,6 @@ public class ProductServiceImpl implements ProductService{
                 productPages.isLast()
         );
     }
-
-
 }
 
 
