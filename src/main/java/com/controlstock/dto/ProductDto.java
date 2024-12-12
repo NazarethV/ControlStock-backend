@@ -22,7 +22,7 @@ public class ProductDto {
     @NotBlank(message = "Please provide product name")
     private String name;
 
-    private String description;//Cómo puse opcional, no le agregué validación adicional
+    private String description;
 
     @Positive(message = "The price must be positive")
     @NotNull(message = "Please provide product´s price")
@@ -37,10 +37,10 @@ public class ProductDto {
     private String category;
 
 
-    private String supplier; //Cómo puse opcional, no le agregué validación adicional
+    private String supplier;
 
 
-    private String image; //Cómo puse opcional, no le agregué validación adicional
+    private String image;
 
     private String imageUrl;
 }

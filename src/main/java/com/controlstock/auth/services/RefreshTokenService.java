@@ -16,7 +16,6 @@ public class RefreshTokenService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    //  Constructor de lo anterior
     public RefreshTokenService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -30,7 +29,7 @@ public class RefreshTokenService {
 
         if (refreshToken == null) { //Si el token de actualización es nulo
             //Hay que generar nuevamente el token
-            long refreshTokenValidity = 5 * 60 * 60 * 10000; //5 horas
+            long refreshTokenValidity = 5 * 60 * 60 * 10000; //5 horas dura el token
             refreshToken = RefreshToken.builder()
                     .refreshToken(UUID.randomUUID().toString())
                     .expirationTime(Instant.now().plusMillis(refreshTokenValidity))
