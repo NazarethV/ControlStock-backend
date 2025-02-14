@@ -33,7 +33,14 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/file/**")
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/file/**",
+                                "/product/**",
+                                "/swagger-ui/**",      // Permitir Swagger UI
+                                "/v3/api-docs/**",     // Permitir documentación OpenAPI
+                                "/swagger-ui.html"     // Permitir acceso a la interfaz de Swagger
+                        )
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -41,7 +48,7 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authFilterService, UsernamePasswordAuthenticationFilter.class)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Configurar CORS aquí
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Configurar CORS
         return http.build();
     }
 
