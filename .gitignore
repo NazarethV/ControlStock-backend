@@ -34,3 +34,5 @@ build/
 
 ### Application Configuration ###
 src/main/resources/application.yml
+application.yml
+application.yml

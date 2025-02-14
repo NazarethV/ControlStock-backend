@@ -20,11 +20,11 @@ public class FileServiceImpl implements FileService{
             throw new IllegalArgumentException("Cannot upload an empty file");
         }
 
-        // Generar un nombre único usando UUID
+        // Generar un nombre único al archivo usando UUID
         String originalFileName = file.getOriginalFilename();
         String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
 
-        // Validar extensión permitida
+        // Valido la extensión permitida
         List<String> allowedExtensions = List.of("jpg", "jpeg", "png", "gif");
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
         if (!allowedExtensions.contains(fileExtension)) {

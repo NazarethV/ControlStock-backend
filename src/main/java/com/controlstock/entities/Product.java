@@ -44,7 +44,7 @@ public class Product {
     private String category;
 
 
-    @Column(nullable = true) //Puede estar vacío este campo
+    @Column(nullable = true)
     @NotBlank(message = "Please provide product's supplier")
     private String supplier;
 

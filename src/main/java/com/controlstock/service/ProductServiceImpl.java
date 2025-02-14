@@ -28,22 +28,19 @@ import java.util.Optional;
 @Service
 public class ProductServiceImpl implements ProductService{
 
-    //Para la Base de datos
     private final ProductRepository productRepository;
     private final FileService fileService;
 
-    //Parámetros del constructor
     public ProductServiceImpl(ProductRepository productRepository, FileService fileService) {
         this.productRepository = productRepository;
         this.fileService = fileService;
     }
 
-    //@Value("${project.imageProduct}")
     @Value("${project.imageProduct}")
-    private String path; //Saqué la url de las imágenes/archivos de los productos ("imageProduct/")
+    private String path;
 
     @Value("${base.url}")
-    private String baseUrl; //Saqué le url base ("http://localhost:8080")
+    private String baseUrl;
 
     @Override
     public ProductDto addProduct(ProductDto productDto, MultipartFile file) throws IOException {
@@ -57,7 +54,6 @@ public class ProductServiceImpl implements ProductService{
 
         //2- Pongo cómo nombre de archivo el valor del campo 'imageProduct'
         productDto.setImage(uploadedFileName);//Pongo el nombre al archivo
-
 
 
         //3-Mapeo el producto DTO al objeto PRODUCT (ProductRepository guarda los datos en la DB y acepta objetos 'Product' por lo que es necesario mapearlo previamente)
@@ -79,7 +75,7 @@ public class ProductServiceImpl implements ProductService{
         //5- Genero la URL para la imagen/archivo del producto
         String imageUrl = baseUrl + "/file/" + uploadedFileName;
 
-        //6- Genero la respuesta que va a devolver este método (Mapeo lo del Obj Product al Obj DTO)
+        //6- Genero la respuesta que va a devolver este m&eacute;todo (Mapeo lo del Obj Product al Obj DTO)
         return new ProductDto(
                 savedProduct.getProductId(),
                 savedProduct.getName(),
@@ -149,14 +145,12 @@ public class ProductServiceImpl implements ProductService{
     }
 
 
-
     @Override
     public ProductDto updateProduct(Integer productId, ProductDto productDto, MultipartFile file) throws IOException {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id = " + productId));
 
         String imageName = existingProduct.getImage(); // Imagen existente por defecto
-
 
         if (file != null && !file.isEmpty()) {
             // Subir el nuevo archivo

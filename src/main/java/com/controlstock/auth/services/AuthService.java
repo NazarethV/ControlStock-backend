@@ -24,8 +24,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest registerRequest) {
-        //Para elegir el rol de usuario
-        UserRole role = registerRequest.getRole() != null ? registerRequest.getRole() : UserRole.USER;
+        UserRole role = registerRequest.getRole() != null ? registerRequest.getRole() : UserRole.USER; //Para elegir el rol de usuario
         var user = User.builder()
                 .name(registerRequest.getName())
                 .email(registerRequest.getEmail())

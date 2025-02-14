@@ -21,7 +21,6 @@ public class AuthFilterService extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    //Constructor de jwtService y userDetailsService
     public AuthFilterService(JwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
@@ -29,7 +28,7 @@ public class AuthFilterService extends OncePerRequestFilter {
 
 
     //Método de la interfaz que extiende de OncePerRequestFilter
-    @Override                      //(Headers)ENVÍA UN ENCABEZADO DE AUTORIZACIÓN
+    @Override                      //(Headers)    ENVÍA UN ENCABEZADO DE AUTORIZACIÓN
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
